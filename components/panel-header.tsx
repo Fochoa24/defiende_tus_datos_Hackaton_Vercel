@@ -1,13 +1,16 @@
-import { Shield, Loader2, Check } from "lucide-react"
+"use client"
+
+import { Shield, Loader2, Check, RotateCcw } from "lucide-react"
 import { type Phase, PHASE_CONFIG, STEPS } from "@/lib/phases"
 import { ProgressBar } from "@/components/progress-bar"
 
 type PanelHeaderProps = {
   phase: Phase
   currentStep: number // 1-based
+  onReset?: () => void
 }
 
-export function PanelHeader({ phase, currentStep }: PanelHeaderProps) {
+export function PanelHeader({ phase, currentStep, onReset }: PanelHeaderProps) {
   const config = PHASE_CONFIG[phase]
 
   // Map phase → step index for the 4-step bar (Problema/Canal/Entrevista/Reclamo)
@@ -40,7 +43,20 @@ export function PanelHeader({ phase, currentStep }: PanelHeaderProps) {
           </h1>
         </div>
 
-        <PhaseBadge phase={phase} />
+        <div className="flex items-center gap-1.5">
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              aria-label="Nueva consulta"
+              title="Nueva consulta"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-white/10"
+            >
+              <RotateCcw className="h-3.5 w-3.5 text-white/60" />
+            </button>
+          )}
+          <PhaseBadge phase={phase} />
+        </div>
       </div>
 
       <p className="mt-1 ml-9 text-[11px] text-white/50 leading-tight">

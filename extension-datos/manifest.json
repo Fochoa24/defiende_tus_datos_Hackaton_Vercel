@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Defensor de Datos · Chile",
+  "description": "Asistente legal de bolsillo para reclamos de protección de datos personales (Ley 21.719)",
+  "version": "0.1.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Defensor de Datos"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["http://localhost:3000/*"]
+}

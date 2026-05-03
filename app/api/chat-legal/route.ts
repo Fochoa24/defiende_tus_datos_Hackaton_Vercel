@@ -1,8 +1,13 @@
 import { z } from "zod/v4"
 import { anthropic, MODEL } from "@/lib/anthropic"
 import { loadKnowledge, KNOWLEDGE_CHAT } from "@/lib/knowledge"
+import { CORS_HEADERS, corsResponse } from "@/lib/cors"
 
 export const runtime = "nodejs"
+
+export async function OPTIONS() {
+  return corsResponse()
+}
 
 const Phase = z.enum(["intake", "canal", "entrevista", "revisando", "entrega"])
 
@@ -98,7 +103,7 @@ export async function POST(req: Request) {
   } catch (err) {
     return Response.json(
       { error: "Invalid request body", detail: String(err) },
-      { status: 400 },
+      { status: 400, headers: CORS_HEADERS },
     )
   }
 
@@ -145,6 +150,7 @@ export async function POST(req: Request) {
 
   return new Response(stream, {
     headers: {
+      ...CORS_HEADERS,
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "no-cache",
       "X-Accel-Buffering": "no",

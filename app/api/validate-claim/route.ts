@@ -2,8 +2,13 @@ import { z } from "zod/v4"
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod"
 import { anthropic, MODEL } from "@/lib/anthropic"
 import { loadKnowledge, KNOWLEDGE_REVISOR } from "@/lib/knowledge"
+import { CORS_HEADERS, corsResponse } from "@/lib/cors"
 
 export const runtime = "nodejs"
+
+export async function OPTIONS() {
+  return corsResponse()
+}
 
 const ChatMessage = z.object({
   role: z.enum(["user", "assistant"]),
@@ -105,7 +110,7 @@ export async function POST(req: Request) {
   } catch (err) {
     return Response.json(
       { error: "Invalid request body", detail: String(err) },
-      { status: 400 },
+      { status: 400, headers: CORS_HEADERS },
     )
   }
 
@@ -146,12 +151,13 @@ export async function POST(req: Request) {
           error: "Model did not return parseable output",
           stop_reason: response.stop_reason,
         },
-        { status: 502 },
+        { status: 502, headers: CORS_HEADERS },
       )
     }
 
     return Response.json(parsed, {
       headers: {
+        ...CORS_HEADERS,
         "x-cache-read": String(response.usage.cache_read_input_tokens ?? 0),
         "x-cache-write": String(
           response.usage.cache_creation_input_tokens ?? 0,
@@ -160,6 +166,9 @@ export async function POST(req: Request) {
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    return Response.json({ error: message }, { status: 500 })
+    return Response.json(
+      { error: message },
+      { status: 500, headers: CORS_HEADERS },
+    )
   }
 }
